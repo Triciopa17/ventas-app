@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            width: auto;
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+        }
+
+        /* Modal for Add/Edit */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container wide">
+        <div class="header">
+            <div>
+                <h1>Gestión</h1>
+                <a href="dashboard.html" style="color: var(--text-muted); text-decoration: none;">&larr; Volver al
+                    Dashboard</a>
+            </div>
+            <button onclick="openModal()" class="btn-secondary" style="width: auto;">+ Nuevo</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn" onclick="switchTab('products')" id="tab-products">Productos</button>
+            <button class="tab-btn" onclick="switchTab('categories')" id="tab-categories">Categorías</button>
+            <button class="tab-btn" onclick="switchTab('users')" id="tab-users">Usuarios</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead id="table-head">
+                    <!-- Dynamic Headers -->
+                </thead>
+                <tbody id="table-body">
+                    <!-- Dynamic Data -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Generic Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Nuevo Item</h2>
+            <form id="modal-form">
+                <div id="modal-fields">
+                    <!-- Dynamic Fields -->
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" onclick="closeModal()" class="btn-secondary">Cancelar</button>
+                    <button type="submit">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js?v=1"></script>
+    <script src="inventory.js?v=1"></script>
+</body>
+
+</html>

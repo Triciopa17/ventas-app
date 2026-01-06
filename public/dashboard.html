@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .menu-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .menu-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container wide">
+        <div class="header">
+            <div>
+                <h1>Menú</h1>
+                <p style="color: var(--text-muted)">Bienvenido, <span id="username-display">Admin</span></p>
+            </div>
+            <button onclick="logout()" class="btn-secondary" style="width: auto;">Cerrar Sesión</button>
+        </div>
+
+        <div class="menu-grid">
+            <a href="pos.html" class="menu-card">
+                <span class="menu-icon">🛒</span>
+                <h3>Realizar Venta</h3>
+                <p style="color: var(--text-muted)">Punto de Venta</p>
+            </a>
+            <a href="inventory.html?tab=products" class="menu-card">
+                <span class="menu-icon">📦</span>
+                <h3>Productos</h3>
+                <p style="color: var(--text-muted)">Gestionar inventario</p>
+            </a>
+            <a href="inventory.html?tab=categories" class="menu-card">
+                <span class="menu-icon">🏷️</span>
+                <h3>Categorías</h3>
+                <p style="color: var(--text-muted)">Gestionar categorías</p>
+            </a>
+            <a href="inventory.html?tab=users" class="menu-card">
+                <span class="menu-icon">👥</span>
+                <h3>Usuarios</h3>
+                <p style="color: var(--text-muted)">Gestionar personal</p>
+            </a>
+            <a href="history.html" class="menu-card">
+                <span class="menu-icon">📜</span>
+                <h3>Historial</h3>
+                <p style="color: var(--text-muted)">Ver ventas pasadas</p>
+            </a>
+        </div>
+    </div>
+    <script src="app.js"></script>
+    <script>
+        checkAuth();
+        document.getElementById('username-display').textContent = localStorage.getItem('username');
+    </script>
+</body>
+
+</html>

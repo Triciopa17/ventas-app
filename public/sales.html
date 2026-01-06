@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sales App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container wide">
+        <div class="header">
+            <div>
+                <h1>Products</h1>
+                <p style="color: var(--text-muted)">Browse and purchase items</p>
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <span id="user-display" style="color: var(--text-color);"></span>
+                <button id="logout-btn" class="btn-secondary">Sign Out</button>
+            </div>
+        </div>
+
+        <div id="products-grid" class="grid">
+            <!-- Products will be injected here -->
+            <p style="text-align: center; grid-column: 1/-1; color: var(--text-muted);">Loading products...</p>
+        </div>
+    </div>
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadProducts();
+
+            document.getElementById('logout-btn').addEventListener('click', logout);
+        });
+    </script>
+</body>
+
+</html>

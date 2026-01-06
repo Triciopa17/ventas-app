@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Ventas - Admin</title>
+    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+
+<body>
+    <div class="container wide">
+        <div class="header">
+            <div>
+                <h1>Historial de Ventas</h1>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a href="dashboard.html" class="btn-secondary btn-auto-width"
+                    style="text-decoration: none; font-size: 1rem; font-weight: 600; padding: 0.75rem; border-radius: 0.5rem; color: white; display: inline-block;">&larr;
+                    Menú Principal</a>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <label style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Desde:</label>
+                    <input type="date" id="date-start"
+                        style="background: white; color: black; border-radius: 4px; padding: 0.5rem; font-family: inherit;">
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <label style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Hasta:</label>
+                    <input type="date" id="date-end"
+                        style="background: white; color: black; border-radius: 4px; padding: 0.5rem; font-family: inherit;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card">
+                <span class="summary-label">Ventas en Efectivo</span>
+                <span class="summary-value cash" id="total-cash">$0</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-label">Ventas con Tarjeta</span>
+                <span class="summary-value card" id="total-card">$0</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-label">Total General</span>
+                <span class="summary-value" id="total-grand">$0</span>
+            </div>
+        </div>
+
+        <!-- History Table -->
+        <div class="card" style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Fecha y Hora</th>
+                        <th>Método</th>
+                        <th>Items</th>
+                        <th style="text-align: right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody id="history-list">
+                    <!-- JS fills this -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="app.js?v=3"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+
+            // Initialize dates to today
+            const dateStart = document.getElementById('date-start');
+            const dateEnd = document.getElementById('date-end');
+
+            if (dateStart && dateEnd) {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                const todayStr = `${year}-${month}-${day}`;
+
+                dateStart.value = todayStr;
+                dateEnd.value = todayStr;
+
+                dateStart.addEventListener('change', loadHistory);
+                dateEnd.addEventListener('change', loadHistory);
+                loadHistory();
+            }
+        });
+
+        async function loadHistory() {
+            const list = document.getElementById('history-list');
+            const dateStart = document.getElementById('date-start');
+            const dateEnd = document.getElementById('date-end');
+
+            // Reset totals
+            document.getElementById('total-cash').textContent = '$0';
+            document.getElementById('total-card').textContent = '$0';
+            document.getElementById('total-grand').textContent = '$0';
+
+            list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 1rem;">Cargando...</td></tr>';
+
+            try {
+                const startVal = dateStart.value;
+                const endVal = dateEnd.value;
+
+                if (!startVal || !endVal) return;
+
+                // Create local date range
+                const start = new Date(startVal + 'T00:00:00');
+                const end = new Date(endVal + 'T23:59:59.999');
+
+                // Pass ISODates
+                const res = await fetch(`${API_URL}/sales?start=${start.toISOString()}&end=${end.toISOString()}`);
+
+                if (!res.ok) throw new Error('Error en servidor');
+
+                const sales = await res.json();
+                list.innerHTML = '';
+
+                if (sales.length === 0) {
+                    list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 2rem; color: var(--text-muted);">No hay ventas registradas para esta fecha</td></tr>';
+                    return;
+                }
+
+                // Calculate Totals
+                let cashTotal = 0;
+                let cardTotal = 0;
+
+                sales.forEach(sale => {
+                    // Render Row
+                    const tr = document.createElement('tr');
+                    const dateObj = new Date(sale.date);
+                    // Show full date since we have a range
+                    const dateTimeStr = dateObj.toLocaleString([], {
+                        year: 'numeric', month: '2-digit', day: '2-digit',
+                        hour: '2-digit', minute: '2-digit'
+                    });
+
+                    const methodLabel = sale.paymentMethod === 'cash' ? '💵 Efectivo' : '💳 Tarjeta';
+
+                    tr.innerHTML = `
+                        <td>${dateTimeStr}</td>
+                        <td>${methodLabel}</td>
+                        <td style="color: var(--text-muted); font-size: 0.9rem;">
+                            ${sale.items.length} items (${sale.items.map(i => `${i.quantity} ${i.productName}`).join(', ')})
+                        </td>
+                        <td style="text-align: right; color: var(--success-color); font-weight: bold;">$${sale.total}</td>
+                    `;
+                    list.appendChild(tr);
+                });
+
+                // Update Summary Display
+                document.getElementById('total-cash').textContent = `$${cashTotal}`;
+                document.getElementById('total-card').textContent = `$${cardTotal}`;
+                document.getElementById('total-grand').textContent = `$${cashTotal + cardTotal}`;
+
+            } catch (err) {
+                console.error(err);
+                list.innerHTML = '<tr><td colspan="4" style="padding: 1rem; color: var(--error-color); text-align: center;">Error al cargar el historial. Revisa la consola.</td></tr>';
+            }
+        }
+    </script>
+</body>
+
+</html>
