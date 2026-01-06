@@ -134,6 +134,10 @@
                 let cardTotal = 0;
 
                 sales.forEach(sale => {
+                    // Update totals
+                    if (sale.paymentMethod === 'cash') cashTotal += sale.total;
+                    else if (sale.paymentMethod === 'card') cardTotal += sale.total;
+
                     // Render Row
                     const tr = document.createElement('tr');
                     const dateObj = new Date(sale.date);
